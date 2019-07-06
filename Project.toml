@@ -1,0 +1,19 @@
+name = "Overdot"
+uuid = "4eba5990-9fa0-11e9-0764-53b134b0a1f5"
+authors = ["Tucker McClure <tucker@anuncommonlab.com>"]
+version = "0.1.0"
+
+[deps]
+HDF5Logger = "a770b2f2-aca6-5e76-943a-580dc53aa03d"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
+
+[compat]
+julia = "≥ 1.0.0"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
