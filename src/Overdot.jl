@@ -19,6 +19,7 @@ using Random
 using LinearAlgebra
 import YAML
 using HDF5Logger
+using Distributed
 
 # For now, our rotations are in another module included with this package. We
 # might move them into their own package if people find them generally useful.
