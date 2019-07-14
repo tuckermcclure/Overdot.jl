@@ -30,7 +30,7 @@ BodyStateEffect() = BodyStateEffect(zeros(3), zeros(3), [0.; 0.; 0.; 1.], zeros(
 function find_effect(effects_bus::Dict{String, Tuple}, null_effect::T) where T
     for effects in values(effects_bus) # effects contains tuple of Effects from each component
         index = findfirst(e->isa(e, T), effects)
-        if !iszero(index)
+        if !isnothing(index)
             return (effects[index], true)
         end
     end
@@ -40,7 +40,7 @@ end
 # Find a single instance of an effect in a vector of effects.
 function find_effect(effects::Vector, null_effect::T) where T
     index = findfirst(e->isa(e, T), effects)
-    if !iszero(index)
+    if !isnothing(index)
         return (effects[index], index)
     end
     return (null_effect, 0)

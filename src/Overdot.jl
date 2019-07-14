@@ -33,11 +33,12 @@ using .OverdotRotations
 
 export UtcDateTime
 export RandSpec, RandSource, MultiRandSource, draw # Rand stuff
-export ModelTiming, DynamicalModel # Top-level modeling types
+export ModelState, ModelTiming, DynamicalModel # Top-level modeling types
 export Computer, Vehicle # Containers
+export BodyConstants
 export LowEarthOrbit, TruthSensor, StarTracker, Gyro, IdealActuator # Models
 export IdealActuatorCommand
-export NoEffect, Gravity, BodyTorque, BodyForce
+export Effect, NoEffect, Gravity, BodyTorque, BodyForce
 export find_effect, accumulate!
 export setup, simulate, mc
 export Scenario, SimParams
@@ -93,6 +94,7 @@ end
 
 # Create a convenience constructor with lots of defaults.
 DynamicalModel(name;
+               # Functions
                startup = nothing,
                init = nothing,
                effects = nothing,
@@ -100,6 +102,7 @@ DynamicalModel(name;
                derivatives = nothing,
                update = nothing,
                shutdown = nothing,
+               # Configuration and example types
                timing = ModelTiming(),
                constants = nothing,
                state = nothing,

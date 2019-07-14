@@ -478,6 +478,7 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                 # beginning of the next propagation, because the discrete
                 # updates below can change their states (and hense resulting
                 # effects) instantly.
+                # TODO: Update V for up-to-date X.
                 E = get_effects(t, X, V, D, U, scenario)
 
                 ###################
@@ -728,13 +729,13 @@ function calculate_time_steps(scenario)
         end
     end
 
+    t      = 0.
+    ts     = Vector{Float64}() # array for time steps
+    ndst   = copy(t_starts) # next discrete sample times
+    counts = zeros(Float64, length(dts)) # how many times each discrete process has triggered
+
     # Make the time history.
     if !isempty(dts)
-
-        t      = 0.
-        ts     = Vector{Float64}() # array for time steps
-        ndst   = copy(t_starts) # next discrete sample times
-        counts = zeros(Float64, length(dts)) # how many times each discrete process has triggered
 
         # We can't need more than the sum of each process triggering on its own.
         # Create a counter so that, when it completes, we bail with an error.
@@ -784,8 +785,8 @@ function calculate_time_steps(scenario)
     else
 
         # Otherwise, we have no discrete times. Step at the maximum rate.
-        t = collect(0.:scenario.sim.dt:scenario.sim.t_end)
-        if t[end] != scenario.sim.t_end # Stop at exactly the end time.
+        ts = collect(0.:scenario.sim.dt:scenario.sim.t_end)
+        if ts[end] != scenario.sim.t_end # Stop at exactly the end time.
             push!(t, senario.sim.t_end)
         end
 
