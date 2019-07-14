@@ -431,7 +431,7 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                 scenario.dims = ScenarioDimensions(nt, nx, nxd, length(stackem(V)), x_to_xd)
 
             end
-# display(X)
+
             #############
             # Propagate #
             #############

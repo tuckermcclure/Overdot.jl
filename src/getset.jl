@@ -144,6 +144,8 @@ stackem(y::T) where {T} = stackem!(Vector{Float64}(), y)
 @generated function stackem!(x, y::T) where {T}
     if T <: Real
         :( push!(x, y) )
+    elseif T <: Enum
+        :( push!(x, Base.Enums.basetype(T)(y)) )
     elseif T <: Array
         if eltype(T) <: Real
             :( append!(x, y) )
@@ -166,7 +168,7 @@ end
 
 # Stack into a preallocated vector, starting at k+1. Returns k, the number elements written.
 @generated function stackem!(x, y::T, k) where {T}
-    if T <: Real
+    if T <: Real || T <: Enum
         quote
             x[k+1] = y
             k+1

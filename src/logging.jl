@@ -2,7 +2,7 @@
 function add!(log::HDF5Logger.Log, slug::String, t::Real, data, n::Int)
     function add_structured!(log, slug, data, n)
         if isbits(data) || (isa(data, Array) && isbitstype(eltype(data)))
-            HDF5Logger.add!(log, slug, data, n) # HDF5Loggeres only know scalars, vectors, and matrices.
+            HDF5Logger.add!(log, slug, data, n) # HDF5Loggers only know scalars, vectors, and matrices.
         else
             for field in fieldnames(typeof(data))
                 add_structured!(log, slug * "/" * string(field), getfield(data, field), n)
