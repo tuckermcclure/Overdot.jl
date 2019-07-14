@@ -16,7 +16,9 @@ end
 # log! a whole structure.
 function log!(log::HDF5Logger.Log, slug::String, t::Real, data)
     function log_structured!(log, slug, data,)
-        if isbits(data) || (isa(data, Array) && isbitstype(eltype(data)))
+        if typeof(data) <: Enum
+            HDF5Logger.log!(log, slug, Base.Enums.basetype(typeof(data))(data))
+        elseif isbits(data) || (isa(data, Array) && isbitstype(eltype(data)))
             HDF5Logger.log!(log, slug, data)
         else
             for field in fieldnames(typeof(data))

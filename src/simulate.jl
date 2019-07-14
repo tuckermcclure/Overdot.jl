@@ -513,8 +513,18 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                             component.timing.count += 1
                             component.timing.t_next = component.timing.dt * component.timing.count + component.timing.t_start
 
-                            # TODO: Log my inputs, resulting state, my outputs. Draws?
+                            # TODO: Log my inputs, my outputs. Draws?
                             # Skip the state if there's a derivative function; it will be logged below.
+                            if log != nothing
+                                if component.derivatives == nothing
+                                    slug = "/" * vehicle.name * "/" * component.name * "/state/"
+                                    log!(log, slug, t[k], component.state)
+                                end
+                                # slug = "/" * vehicle.name * "/" * component.name * "/inputs/"
+                                # log!(log, slug, t[k], U[vehicle.name][component.name])
+                                # slug = "/" * vehicle.name * "/" * component.name * "/outputs/"
+                                # log!(log, slug, t[k], Y[vehicle.name][component.name])
+                            end
 
                         end
                     end
