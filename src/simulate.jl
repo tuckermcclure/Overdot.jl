@@ -289,7 +289,7 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
         # sim parameters too? How do we log t_next/t_start?
 
         # Preallocate space for the streams we'll need in the logger.
-        if log != nothing
+        if !isnothing(log)
 
             # TODO: Log environment.
 
@@ -297,29 +297,29 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
 
                 ## Set up the streams for the vehicle's truth.
                 slug = "/" * vehicle.name * "/" * vehicle.body.name * "/state/"
-                add!(log, slug, t[1], vehicle.body.state, nt)
+                add!(log, slug, t[1], vehicle.body.state, nt, true)
 
                 # Set up the streams for the components.
                 for component in vehicle.components
 
                     # State
-                    if component.state != nothing
+                    if !isnothing(component.state)
                         slug = "/" * vehicle.name * "/" * component.name * "/state/"
-                        if component.derivatives != nothing
+                        if !isnothing(component.derivatives)
                             num_samples = nt
                         else
                             num_samples = Int64(floor((scenario.sim.t_end - component.timing.t_start) / component.timing.dt)) + 1
                         end
-                        add!(log, slug, t[1], component.state, num_samples)
+                        add!(log, slug, t[1], component.state, num_samples, true)
                     end
 
                     # TODO: Inputs
 
                     # Outputs
-                    if component.outputs != nothing
+                    if !isnothing(component.outputs)
                         slug = "/" * vehicle.name * "/" * component.name * "/outputs/"
                         num_samples = Int64(floor((scenario.sim.t_end - component.timing.t_start) / component.timing.dt)) + 1
-                        add!(log, slug, t[1], Y[vehicle.name][component.name], num_samples)
+                        add!(log, slug, t[1], Y[vehicle.name][component.name], num_samples, true)
                     end
 
                 end
@@ -331,10 +331,10 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                     # TODO: Inputs
 
                     # Outputs
-                    if computer.board.outputs != nothing
+                    if !isnothing(computer.board.outputs)
                         slug = "/" * vehicle.name * "/" * computer.name * "/" * computer.board.name * "/outputs/"
                         num_samples = Int64(floor((scenario.sim.t_end - component.board.timing.t_start) / component.board.timing.dt)) + 1
-                        add!(log, slug, t[1], Y[vehicle.name][computer.name][computer.board.name], num_samples)
+                        add!(log, slug, t[1], Y[vehicle.name][computer.name][computer.board.name], num_samples, true)
                     end
 
                     for software in computer.software
@@ -344,10 +344,10 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                         # TODO: Inputs
 
                         # Outputs
-                        if software.outputs != nothing
+                        if !isnothing(software.outputs)
                             slug = "/" * vehicle.name * "/" * computer.name * "/" * software.name * "/outputs/"
                             num_samples = Int64(floor((scenario.sim.t_end - software.timing.t_start) / software.timing.dt)) + 1
-                            add!(log, slug, t[1], Y[vehicle.name][computer.name][software.name], num_samples)
+                            add!(log, slug, t[1], Y[vehicle.name][computer.name][software.name], num_samples, true)
                         end
 
                     end
@@ -522,8 +522,10 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                                 end
                                 # slug = "/" * vehicle.name * "/" * component.name * "/inputs/"
                                 # log!(log, slug, t[k], U[vehicle.name][component.name])
-                                # slug = "/" * vehicle.name * "/" * component.name * "/outputs/"
-                                # log!(log, slug, t[k], Y[vehicle.name][component.name])
+                                if !isnothing(component.outputs)
+                                    slug = "/" * vehicle.name * "/" * component.name * "/outputs/"
+                                    log!(log, slug, t[k], Y[vehicle.name][component.name])
+                                end
                             end
 
                         end
@@ -616,33 +618,33 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
 
                 end # for each vehicle
 
-            end # k > 1
+                ###########
+                # Logging #
+                ###########
 
-            ###########
-            # Logging #
-            ###########
-
-            # Log the continuous states.
-            if log != nothing
-                for vehicle in scenario.vehicles
-                    if vehicle.body.derivatives != nothing
-                        slug = "/" * vehicle.name * "/" * vehicle.body.name * "/state/"
-                        log!(log, slug, t[k], vehicle.body.state)
-                    end
-                    for component in vehicle.components
-                        if component.derivatives != nothing
-                            slug = "/" * vehicle.name * "/" * component.name * "/state/"
-                            log!(log, slug, t[k], component.state)
+                # Log the continuous states.
+                if log != nothing
+                    for vehicle in scenario.vehicles
+                        if vehicle.body.derivatives != nothing
+                            slug = "/" * vehicle.name * "/" * vehicle.body.name * "/state/"
+                            log!(log, slug, t[k], vehicle.body.state)
                         end
-                    end
-                    for computer in vehicle.computers
-                        if computer.board.derivatives != nothing
-                            slug = "/" * vehicle.name * "/" * computer.name * "/" * computer.board.name * "/state/"
-                            log!(log, slug, t[k], computer.board.state)
+                        for component in vehicle.components
+                            if component.derivatives != nothing
+                                slug = "/" * vehicle.name * "/" * component.name * "/state/"
+                                log!(log, slug, t[k], component.state)
+                            end
+                        end
+                        for computer in vehicle.computers
+                            if computer.board.derivatives != nothing
+                                slug = "/" * vehicle.name * "/" * computer.name * "/" * computer.board.name * "/state/"
+                                log!(log, slug, t[k], computer.board.state)
+                            end
                         end
                     end
                 end
-            end
+
+            end # k > 1
 
         end # sim loop
 
