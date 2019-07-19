@@ -101,10 +101,10 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
         for vehicle in scenario.vehicles
             U[vehicle.name] = Dict{String,Any}()
             Y[vehicle.name] = Dict{String,Any}()
-            U[vehicle.name][vehicle.body.name]  = vehicle.body.inputs
+            U[vehicle.name][vehicle.body.name] = vehicle.body.inputs
             Y[vehicle.name][vehicle.body.name] = vehicle.body.outputs
             for component in vehicle.components
-                U[vehicle.name][component.name]  = component.inputs
+                U[vehicle.name][component.name] = component.inputs
                 Y[vehicle.name][component.name] = component.outputs
             end
             for computer in vehicle.computers
@@ -319,6 +319,8 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                     if !isnothing(component.outputs)
                         slug = "/" * vehicle.name * "/" * component.name * "/outputs/"
                         num_samples = Int64(floor((scenario.sim.t_end - component.timing.t_start) / component.timing.dt)) + 1
+                        display(Y[vehicle.name][component.name])
+                        display(typeof(Y[vehicle.name][component.name]))
                         add!(log, slug, t[1], Y[vehicle.name][component.name], num_samples, true)
                     end
 
@@ -516,7 +518,7 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                             # TODO: Log my inputs, my outputs. Draws?
                             # Skip the state if there's a derivative function; it will be logged below.
                             if log != nothing
-                                if component.derivatives == nothing
+                                if component.derivatives == nothing && !isnothing(component.state)
                                     slug = "/" * vehicle.name * "/" * component.name * "/state/"
                                     log!(log, slug, t[k], component.state)
                                 end
