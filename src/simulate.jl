@@ -319,8 +319,6 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                     if !isnothing(component.outputs)
                         slug = "/" * vehicle.name * "/" * component.name * "/outputs/"
                         num_samples = Int64(floor((scenario.sim.t_end - component.timing.t_start) / component.timing.dt)) + 1
-                        display(Y[vehicle.name][component.name])
-                        display(typeof(Y[vehicle.name][component.name]))
                         add!(log, slug, t[1], Y[vehicle.name][component.name], num_samples, true)
                     end
 
@@ -605,7 +603,17 @@ function simulate(progress_fcn::Union{Function,Nothing}, scenario::Scenario, nee
                                 # next sample.
                                 Y[vehicle.name][computer.name][software.name] = vehicle_outputs_temp[computer.name][software.name]
 
-                                # TODO: Log my inputs, resulting state, my outputs.
+                                # TODO: Log my inputs.
+                                if !isnothing(log)
+                                    if !isnothing(software.state)
+                                        slug = "/" * vehicle.name * "/" * computer.name * "/" * software.name * "/state/"
+                                        log!(log, slug, t[k], software.state)
+                                    end
+                                    if !isnothing(software.outputs)
+                                        slug = "/" * vehicle.name * "/" * computer.name * "/" * software.name * "/outputs/"
+                                        log!(log, slug, t[k], Y[vehicle.name][computer.name][software.name])
+                                    end
+                                end
 
                             end
                         end # software
